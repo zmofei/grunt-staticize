@@ -1,0 +1,42 @@
+{
+  "name": "grunt-staticize",
+  "description": "The best Grunt plugin ever.",
+  "version": "0.0.0",
+  "homepage": "https://github.com/zmofei/grunt-staticize",
+  "author": {
+    "name": "Z.Mofei",
+    "email": "13761509829@163.com",
+    "url": "http://www.zhuwenlong.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zmofei/grunt-staticize"
+  },
+  "bugs": {
+    "url": "https://github.com/zmofei/grunt-staticize/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/zmofei/grunt-staticize/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-nodeunit": "^0.3.3",
+    "grunt": "~0.4.5"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.5"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
