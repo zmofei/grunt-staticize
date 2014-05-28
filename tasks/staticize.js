@@ -42,7 +42,7 @@ module.exports = function(grunt) {
                     fs.renameSync(ele, resultPath);
                 }
 
-                // grunt.log.writeln(chalk.cyan('✔  ') + ele + chalk.gray(' -> ') + newName);
+                grunt.log.writeln(chalk.cyan('✔  ') + ele + chalk.gray(' -> ') + newName);
             });
         }
         for (var i in revtask) {
