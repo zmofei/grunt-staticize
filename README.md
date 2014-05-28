@@ -49,55 +49,140 @@ grunt.initConfig({
 });
 ```
 
-### Options
+=======
 
-#### options.separator
-Type: `String`
-Default value: `',  '`
+### Revisioning task
 
-A string value that is used to do something with whatever.
+Revisionging task is to add hash for files,like:  `/static/logo.jpg` -> `/static/logo.d124da.jpg`
 
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
+Revisionging use field `rev` to defined.
 
-A string value that is used to do something else with whatever else.
+`rev` is a json type,which inclode some target,and a option
 
-### Usage Examples
+```js
+//...
+  rev:{
+    targetA:{
+      //...
+    }
+    targetB:{
+      //...
+    }
+    option:{
+      //...
+    }
+  }
+//...
+``` 
+#### target
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+In each target you need defined `files`(the files you want opration) and `dest`(where you save the new files)
+
+`dest` is optional,if you write this value,the new files will save to this folder, if you didn't write this,the old files will overwrite by the new files.
+
+#### options [optional]
+
+##### options.encoding [optional] 
+
+Type: `String` Default value: `utf8`
+
+the files' encoding
+
+##### options.algorithm [optional]  
+
+Type: `String` Default value: `md5`
+
+the files hash type
+
+##### options.length [optional] 
+
+Type: `String` Default value: `8`
+
+the hash length in the filename
+
+#### example
 
 ```js
 grunt.initConfig({
   staticize: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+    targetName:{
+      rev:{  //revisioning task
+        msite:{ //target
+          'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
+          'dest': 'testF_2'
+        },
+        options: {  //revisioning options
+          'encoding': 'utf8',
+          'algorithm': 'md5',
+          'length': 8
+        }
+      }
+    }
   },
 });
 ```
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+=====
+
+### Replace task
+
+Replace task is to replace all the resources' link url
+
+That's say after you `/static/logo.jpg` -> `/static/logo.d124da.jpg`,you can use replace task to change all the place which use this file, for example in `index.css` and `index.html` we have 
+
+```css
+.logo{
+  background:url('/static/logo.jpg');
+}
+```
+
+```html
+<img src="/static/logo.jpg">
+```
+after replace task,this two file will became
+
+```css
+.logo{
+  background:url('/static/logo.d124da.jpg');
+}
+```
+
+```html
+<img src="/static/logo.d124da.jpg">
+```
+
+Revisionging use field `rep` to defined.
+
+`rep` is a json type,which inclode some target
+
+```js
+//...
+  rev:{
+    targetA: { },
+    targetB: { }
+  }
+//...
+``` 
+#### target
+
+In each target you need defined `files`(the files you want opration) and `assetsDirs`(the static's place ) and `patterns` (which we need replace)
+
+#### example
 
 ```js
 grunt.initConfig({
   staticize: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+    rep: {  //replace task
+      msite: {  //target
+        'files': ['temp/msite/*.{css,js,jade}'],  //replace this files 
+        'assetsDirs': 'temp/msite/static/',  //the static which files use in 'temp/msite/static/'
+        'patterns': /\/{0,1}\w+(\/\w+)*\.\w+/mg  //if match for example 'ad/ad.jpg','dfa/d.css' and try to replace the match based on the 'assetsDirs'
+      }
+    }
   },
 });
 ```
 
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
-## Release History
-_(Nothing yet)_
+======
+
