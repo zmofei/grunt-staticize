@@ -67,7 +67,8 @@ module.exports = function(grunt) {
                 var hit = 0;
                 var log = '';
                 var result = grunt.file.read(file).replace(patterns, function() {
-                    var fileSrc = arguments[0].replace(/^\//, '');
+                    //var fileSrc = arguments[0].replace(/^\//, '');
+                    var fileSrc = arguments[0];
                     var regStr = fileSrc.replace(/\.\w+$/, function() {
                         return '(\\.\\w+)*' + arguments[0];
                     });
@@ -77,13 +78,17 @@ module.exports = function(grunt) {
                     if (result.length > 0 && (fileSrc !== result[0])) {
                         hit++;
                         log += '\t ' + fileSrc + ' -> ' + result[0] + '\n';
-                        return result[0];
+
+                        var prePath=/^\//.test(arguments[0])?'/':'';
+                        return prePath+result[0];
+
                     } else {
                         return arguments[0];
                     }
                 });
+                grunt.log.writeln(chalk.cyan('↔ ') + file);
                 if (hit > 0) {
-                    grunt.log.writeln(chalk.cyan('↔ ') + file);
+                    
                     grunt.log.writeln(chalk.gray(log));
                 }
                 grunt.file.write(file, result);

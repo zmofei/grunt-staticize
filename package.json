@@ -1,7 +1,7 @@
 {
   "name": "grunt-staticize",
   "description": "Staticize your static files. Easy and simple",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/zmofei/grunt-staticize",
   "author": {
     "name": "Z.Mofei",
