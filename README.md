@@ -1,6 +1,6 @@
 # grunt-staticize
 
-> The best Grunt plugin ever.
+> Staticize your static files.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
@@ -25,12 +25,26 @@ In your project's Gruntfile, add a section named `staticize` to the data object 
 ```js
 grunt.initConfig({
   staticize: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
+    targetName:{
+      rev:{  //revisioning task
+        msite:{ //target
+          'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
+          'dest': 'testF_2'
+        },
+        options: {  //revisioning options
+          'encoding': 'utf8',
+          'algorithm': 'md5',
+          'length': 8
+        }
+      },
+      rep: {  //replace task
+        msite: {  //target
+          'files': ['temp/msite/*.{css,js,jade}'],
+          'assetsDirs': 'temp/msite/static/',
+          'patterns': /\/{0,1}\w+(\/\w+)*\.\w+/mg
+        }
+      }
+    }
   },
 });
 ```

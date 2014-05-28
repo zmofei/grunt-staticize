@@ -7,44 +7,94 @@
  */
 
 'use strict';
+var crypto = require('crypto');
+var path = require('path');
+var fs = require('fs');
+var chalk = require('chalk');
 
 module.exports = function(grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+    grunt.registerMultiTask('staticize', 'The best Grunt plugin ever.', function() {
+        //rev task
+        grunt.log.writeln(chalk.underline('Revisioning tasking'));
+        var revtask = this.data.rev || {};
+        var revOption = revtask.options || {};
 
-  grunt.registerMultiTask('staticize', 'The best Grunt plugin ever.', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
+        function revRun(filePath, dest, revOption) {
+            //rev files
+            var mapping = grunt.file.expand(filePath, dest);
+            mapping.forEach(function(ele) {
+                var dirname, resultPath;
+                var hash = crypto.createHash(revOption.algorithm || 'md5').update(grunt.file.read(ele), (revOption.encoding || 'utf8')).digest('hex');
+                hash = hash.slice(0, (revOption.length || 8));
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
+                var ext = path.extname(ele);
+                var newName = [path.basename(ele, ext), hash, ext.slice(1)].join('.');
+
+                if (dest) {
+                    console.log(dest, ele);
+                    dirname = dest;
+                    resultPath = path.resolve(dirname, path.dirname(ele), newName);
+                    grunt.file.copy(ele, resultPath);
+                } else {
+                    dirname = path.dirname(ele);
+                    resultPath = path.resolve(dirname, newName);
+                    fs.renameSync(ele, resultPath);
+                }
+
+                // grunt.log.writeln(chalk.cyan('✔  ') + ele + chalk.gray(' -> ') + newName);
+            });
         }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+        for (var i in revtask) {
+            if (i !== 'options') {
+                revRun(revtask[i].files, revtask[i].dest, revOption);
+            }
+        }
+        grunt.log.writeln(chalk.underline('Revisioning task end'));
+        //repalce task
+        grunt.log.writeln(chalk.underline('Repalce tasking'));
+        var reptask = this.data.rep || {};
 
-      // Handle options.
-      src += options.punctuation;
+        function repRun(files, patterns, assetsDirs) {
+            if (!files || !patterns) {
+                return false;
+            }
+            var mapping = grunt.file.expand(files);
+            var allFiles = grunt.file.expand({
+                cwd: assetsDirs
+            }, '**/*.*');
+            mapping.forEach(function(file) {
+                var hit = 0;
+                var log = '';
+                var result = grunt.file.read(file).replace(patterns, function() {
+                    var fileSrc = arguments[0].replace(/^\//, '');
+                    var regStr = fileSrc.replace(/\.\w+$/, function() {
+                        return '(\\.\\w+)*' + arguments[0];
+                    });
+                    var result = allFiles.filter(function(fileName) {
+                        return new RegExp('^' + regStr + '$').test(fileName);
+                    });
+                    if (result.length > 0 && (fileSrc !== result[0])) {
+                        hit++;
+                        log += '\t ' + fileSrc + ' -> ' + result[0] + '\n';
+                        return result[0];
+                    } else {
+                        return arguments[0];
+                    }
+                });
+                if (hit > 0) {
+                    grunt.log.writeln(chalk.cyan('↔ ') + file);
+                    grunt.log.writeln(chalk.gray(log));
+                }
+                grunt.file.write(file, result);
+            });
+        }
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
+        for (var reps in reptask) {
+            repRun(reptask[reps].files, reptask[reps].patterns, reptask[reps].assetsDirs || '');
+        }
 
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
+        grunt.log.writeln(chalk.underline('Repalce task end'));
+
     });
-  });
-
 };

@@ -1,6 +1,6 @@
 {
   "name": "grunt-staticize",
-  "description": "The best Grunt plugin ever.",
+  "description": "Staticize your static files.",
   "version": "0.0.0",
   "homepage": "https://github.com/zmofei/grunt-staticize",
   "author": {
@@ -38,5 +38,8 @@
   },
   "keywords": [
     "gruntplugin"
-  ]
+  ],
+  "dependencies": {
+    "chalk": "^0.4.0"
+  }
 }
