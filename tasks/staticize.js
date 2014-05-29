@@ -60,37 +60,38 @@ module.exports = function(grunt) {
                 return false;
             }
             var mapping = grunt.file.expand(files);
-            var allFiles = grunt.file.expand({
-                cwd: assetsDirs
-            }, '**/*.*');
+
+            var allFilesPath = path.join('online/static', '**/*.*');
+            var allFiles = grunt.file.expand(allFilesPath);
+
             mapping.forEach(function(file) {
-                var hit = 0;
                 var log = '';
+                grunt.log.writeln(chalk.cyan('☂  CheckFile: ') + file);
+
                 var result = grunt.file.read(file).replace(patterns, function() {
-                    //var fileSrc = arguments[0].replace(/^\//, '');
-                    var fileSrc = arguments[0];
-                    var regStr = fileSrc.replace(/\.\w+$/, function() {
-                        return '(\\.\\w+)*' + arguments[0];
-                    });
-                    var result = allFiles.filter(function(fileName) {
-                        return new RegExp('^' + regStr + '$').test(fileName);
-                    });
-                    if (result.length > 0 && (fileSrc !== result[0])) {
-                        hit++;
-                        log += '\t ' + fileSrc + ' -> ' + result[0] + '\n';
 
-                        var prePath=/^\//.test(arguments[0])?'/':'';
-                        return prePath+result[0];
-
+                    var relaPath = path.join(assetsDirs, arguments[0]);
+                    var absoPath = path.resolve(relaPath);
+                    var absoPathRegStr = absoPath.replace(/\.\w+$/, function() {
+                        return '(\\.\\w{' + (revOption.length || 8) + '})+' + arguments[0];
+                    });
+                    var absoPathReg = new RegExp(absoPathRegStr);
+                    var result = allFiles.filter(function(filePath) {
+                        var tryMatch = absoPathReg.test(path.resolve(filePath));
+                        return tryMatch;
+                    });
+                    if (result.length > 0) {
+                        var parentPath = path.join(arguments[0], '..');
+                        var resultPath = path.join(parentPath, path.basename(result[0]));
+                        log += '    ' + chalk.cyan('↺  Replaced: ') + chalk.gray(arguments[0] + ' -> ' + resultPath) + '\n';
+                        return resultPath;
                     } else {
                         return arguments[0];
                     }
-                });
-                grunt.log.writeln(chalk.cyan('↔ ') + file);
-                if (hit > 0) {
                     
-                    grunt.log.writeln(chalk.gray(log));
-                }
+                });
+
+                grunt.log.writeln(log);
                 grunt.file.write(file, result);
             });
         }
