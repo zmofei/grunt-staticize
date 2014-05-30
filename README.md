@@ -151,13 +151,13 @@ after replace task,this two file will became
 <img src="/static/logo.d124da.jpg">
 ```
 
-Revisionging use field `rep` to defined.
+Replace use field `rep` to defined.
 
 `rep` is a json type,which inclode some target
 
 ```js
 //...
-  rev:{
+  rep:{
     targetA: { },
     targetB: { }
   }
