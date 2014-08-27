@@ -12,6 +12,33 @@ var path = require('path');
 var fs = require('fs');
 var chalk = require('chalk');
 
+// useage
+// 
+// grunt.initConfig({
+//     staticize: {
+//         targetName: {
+//             rev: { //校订任务（hash）
+//                 msite: { //任务名称(task name)
+//                     'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
+//                     'dest': 'testF_2'
+//                 },
+//                 options: { //任务配置(task config)
+//                     'encoding': 'utf8',
+//                     'algorithm': 'md5',
+//                     'length': 8
+//                 }
+//             },
+//             rep: { //替换任务(repalce)
+//                 msite: { //替换任务名称 (task name)
+//                     'files': ['temp/msite/*.{css,js,jade}'],
+//                     'assetsDirs': 'temp/msite/static/',
+//                     'patterns': /\/{0,1}\w+(\/\w+)*\.\w+/mg
+//                 }
+//             }
+//         }
+//     },
+// });
+
 module.exports = function(grunt) {
 
     grunt.registerMultiTask('staticize', 'The best Grunt plugin ever.', function() {
@@ -61,7 +88,7 @@ module.exports = function(grunt) {
             }
             var mapping = grunt.file.expand(files);
 
-            var allFilesPath = path.join('online/static', '**/*.*');
+            var allFilesPath = path.join(assetsDirs, '**/*.*');
             var allFiles = grunt.file.expand(allFilesPath);
 
             mapping.forEach(function(file) {
@@ -88,7 +115,7 @@ module.exports = function(grunt) {
                     } else {
                         return arguments[0];
                     }
-                    
+
                 });
 
                 grunt.log.writeln(log);
