@@ -28,6 +28,7 @@ grunt.initConfig({
     targetName:{
       rev:{  //revisioning task
         msite:{ //target
+          'cwd':'folderPath',
           'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
           'dest': 'testF_2'
         },
@@ -108,6 +109,7 @@ grunt.initConfig({
     targetName:{
       rev:{  //revisioning task
         msite:{ //target
+          'cwd':'folderPath',
           'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
           'dest': 'testF_2'
         },
