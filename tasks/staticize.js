@@ -19,6 +19,7 @@ var chalk = require('chalk');
 //         targetName: {
 //             rev: { //校订任务（hash）
 //                 msite: { //任务名称(task name)
+//                        'cwd':'folderPath',
 //                     'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
 //                     'dest': 'testF_2'
 //                 },
@@ -46,10 +47,12 @@ module.exports = function(grunt) {
         grunt.log.writeln(chalk.underline('Revisioning tasking'));
         var revtask = this.data.rev || {};
         var revOption = revtask.options || {};
+        var cwd;
 
-        function revRun(filePath, dest, revOption) {
+
+        function revRun(filePath, dest, cwd, revOption) {
             //rev files
-            var mapping = grunt.file.expand(filePath, dest);
+            var mapping = grunt.file.expand(cwd+filePath, dest);
             mapping.forEach(function(ele) {
                 var dirname, resultPath;
                 var hash = crypto.createHash(revOption.algorithm || 'md5').update(grunt.file.read(ele), (revOption.encoding || 'utf8')).digest('hex');
@@ -61,7 +64,7 @@ module.exports = function(grunt) {
                 if (dest) {
                     console.log(dest, ele);
                     dirname = dest;
-                    resultPath = path.resolve(dirname, path.dirname(ele), newName);
+                    resultPath = path.resolve(dirname, path.dirname(ele).replace(cwd,''), newName);
                     grunt.file.copy(ele, resultPath);
                 } else {
                     dirname = path.dirname(ele);
@@ -74,7 +77,8 @@ module.exports = function(grunt) {
         }
         for (var i in revtask) {
             if (i !== 'options') {
-                revRun(revtask[i].files, revtask[i].dest, revOption);
+                cwd = revtask[i].cwd || '';
+                revRun(revtask[i].files, revtask[i].dest,cwd,revOption);
             }
         }
         grunt.log.writeln(chalk.underline('Revisioning task end'));
