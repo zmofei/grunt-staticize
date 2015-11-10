@@ -114,6 +114,7 @@ module.exports = function(grunt) {
                     if (result.length > 0) {
                         var parentPath = path.join(arguments[0], '..');
                         var resultPath = path.join(parentPath, path.basename(result[0]));
+                        resultPath = resultPath.replace(/\\/g,'/');
                         log += '    ' + chalk.cyan('↺  Replaced: ') + chalk.gray(arguments[0] + ' -> ' + resultPath) + '\n';
                         return resultPath;
                     } else {
