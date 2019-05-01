@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)https://www.zhuwenlong.com/lab/mstaticize -->
+<html class="gr__zhuwenlong_com"><script src="./web/hm.js"></script><script type="text/javascript" async="" src="./web/analytics.js"></script><script>(function main() {
+    // Create enabled event
+    function fireEnabledEvent() {
+        // If gli exists, then we are already present and shouldn't do anything
+        if (!window.gli) {
+            setTimeout(function () {
+                var enabledEvent = document.createEvent("Event");
+                enabledEvent.initEvent("WebGLEnabledEvent", true, true);
+                document.dispatchEvent(enabledEvent);
+            }, 0);
+        } else {
+            //console.log("WebGL Inspector already embedded on the page - disabling extension");
+        }
+    };
+
+    // Grab the path root from the extension
+    document.addEventListener("WebGLInspectorReadyEvent", function (e) {
+        var pathElement = document.getElementById("__webglpathroot");
+        if (window["gliloader"]) {
+            gliloader.pathRoot = pathElement.innerText;
+        } else {
+            // TODO: more?
+            window.gliCssUrl = pathElement.innerText + "gli.all.css";
+        }
+    }, false);
+
+    // Rewrite getContext to snoop for webgl
+    var originalGetContext = HTMLCanvasElement.prototype.getContext;
+    if (!HTMLCanvasElement.prototype.getContextRaw) {
+        HTMLCanvasElement.prototype.getContextRaw = originalGetContext;
+    }
+    HTMLCanvasElement.prototype.getContext = function () {
+        var ignoreCanvas = this.internalInspectorSurface;
+        if (ignoreCanvas) {
+            return originalGetContext.apply(this, arguments);
+        }
+
+        var result = originalGetContext.apply(this, arguments);
+        if (result == null) {
+            return null;
+        }
+
+        var contextNames = ["moz-webgl", "webkit-3d", "experimental-webgl", "webgl", "3d"];
+        var requestingWebGL = contextNames.indexOf(arguments[0]) != -1;
+        if (requestingWebGL) {
+            // Page is requesting a WebGL context!
+            fireEnabledEvent(this);
+
+            // If we are injected, inspect this context
+            if (window.gli) {
+                if (gli.host.inspectContext) {
+                    // TODO: pull options from extension
+                    result = gli.host.inspectContext(this, result);
+                    // NOTE: execute in a timeout so that if the dom is not yet
+                    // loaded this won't error out.
+                    window.setTimeout(function() {
+                        var hostUI = new gli.host.HostUI(result);
+                        result.hostUI = hostUI; // just so we can access it later for debugging
+                    }, 0);
+                }
+            }
+        }
+
+        return result;
+    };
+})();</script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="description" content="一个轻量级，基于文件系统的node.js web server框架"><meta name="author" content="朱文龙"><meta name="author" content="Z.Mofei"><meta name="keywords" content="朱文龙,Z.Mofei,Mofei,node.js,web server,框架"><title>mSite,快速搭建node.js网站</title><link rel="stylesheet" href="./web/mstaticize-73fcbcb9af.css"><script async="" src="./web/js"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-109405512-1');</script><style>#cVim-command-bar, #cVim-command-bar-mode, #cVim-command-bar-input, #cVim-command-bar-search-results,
+.cVim-completion-item, .cVim-completion-item .cVim-full, .cVim-completion-item .cVim-left,
+.cVim-completion-item .cVim-right {
+  font-family: Helvetica, Helvetica Neue, Neue, sans-serif, monospace, Arial;
+  font-size: 10pt !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+#cVim-command-bar {
+  position: fixed;
+  z-index: 2147483646;
+  background-color: #1b1d1e;
+  color: #bbb;
+  display: none;
+  box-sizing: content-box;
+  box-shadow: 0 3px 3px rgba(0,0,0,0.4);
+  left: 0;
+  width: 100%;
+  height: 20px;
+}
+
+#cVim-command-bar-mode {
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;
+  padding-left: 2px;
+  height: 100%;
+  width: 10px;
+  padding-top: 2px;
+  color: #888;
+}
+
+#cVim-command-bar-input {
+  background-color: #1b1d1e;
+  color: #bbb;
+  height: 100%;
+  right: 0;
+  top: 0;
+  width: calc(100% - 10px);
+  position: absolute;
+}
+
+#cVim-command-bar-search-results {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+  z-index: 2147483647;
+  left: 0;
+  box-shadow: 0 3px 3px rgba(0,0,0,0.4);
+  background-color: #1c1c1c;
+}
+
+.cVim-completion-item, .cVim-completion-item .cVim-full, .cVim-completion-item .cVim-left, .cVim-completion-item .cVim-right {
+  text-overflow: ellipsis;
+  padding: 1px;
+  display: inline-block;
+  box-sizing: border-box;
+  vertical-align: middle;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cVim-completion-item:nth-child(even) {
+  background-color: #1f1f1f;
+}
+
+.cVim-completion-item {
+  width: 100%; left: 0;
+  color: #bcbcbc;
+}
+
+.cVim-completion-item[active] {
+  width: 100%; left: 0;
+  color: #1b1d1e;
+  background-color: #f1f1f1;
+}
+
+.cVim-completion-item[active] span {
+  color: #1b1d1e;
+}
+
+.cVim-completion-item .cVim-left {
+  color: #fff;
+  width: 37%;
+}
+
+.cVim-completion-item .cVim-right {
+  font-style: italic;
+  color: #888;
+  width: 57%;
+}
+
+
+#cVim-link-container, .cVim-link-hint,
+#cVim-hud, #cVim-status-bar {
+  font-family: Helvetica, Helvetica Neue, Neue, sans-serif, monospace, Arial;
+  font-size: 10pt !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+#cVim-link-container {
+  position: absolute;
+  pointer-events: none;
+  width: 100%; left: 0;
+  height: 100%; top: 0;
+  z-index: 2147483647;
+}
+
+.cVim-link-hint {
+  position: absolute;
+  color: #302505 !important;
+  background-color: #ffd76e !important;
+  border-radius: 2px !important;
+  padding: 2px !important;
+  font-size: 8pt !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  border: 1px solid #ad810c;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  box-shadow: 2px 2px 1px rgba(0,0,0,0.25) !important;
+}
+
+.cVim-link-hint_match {
+  color: #777;
+  text-transform: uppercase !important;
+}
+
+
+#cVim-hud {
+  background-color: rgba(28,28,28,0.9);
+  position: fixed !important;
+  transition: right 0.2s ease-out;
+  z-index: 24724289;
+}
+
+#cVim-hud span {
+  padding: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: #8f8f8f;
+  font-size: 10pt;
+}
+
+#cVim-frames-outline {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  right: 0;
+  z-index: 9999999999;
+  box-sizing: border-box;
+  border: 3px solid yellow;
+}
+</style></head><body data-gr-c-s-loaded="true"><div class="github"><a href="https://github.com/zmofei/mSite"><img style="position: absolute; top: 0; right: 0; border: 0;" src="./web/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a></div><header><span class="logo"><img src="./web/mStaticize-3c0413ec1a.png"></span><span class="intro"><h1>mStaticize</h1><h2>一个简单易用的前端发布工具 easy&amp;&amp;simple</h2></span></header><div class="infoBar"><p>☺ 使用 mStaticize 通过简单的配置，就可以实现前端资源的静态化（hash），自动替换资源引用等实用的前端文件打包功能。</p><pre class="beforeDeal"><span class="comment">//代码处理前（开发环境）</span>
+|-- index.php <span class="comment">↓</span>
+|       <span class="codegrey">&gt;  &lt; link href="css/index-ecb0bba0a3.css"&gt;</span>
+|       <span class="codegrey">&gt;  &lt; script src="js/index-27d5ced115.js"&gt;</span>
+|-- css
+|    |-- index.css <span class="comment">↓</span>
+|    |     <span class="codegrey">&gt;  .logo{background:url('/img/a.png')}</span>
+|-- js
+|    |-- index.js 
+|-- img
+     |-- a.png
+     |-- b.png</pre><pre class="afterDeal"><span class="comment">//代码处理后（上线文件）</span>
+|-- online20140530
+|        <span class="comment">//静态资源hash化处理，自动替换对静态资源的引用</span>
+|        |-- index.php <span class="comment">↓</span>
+|        |       <span class="codegrey">&gt;  &lt; link href="css/index.<span class="spec">3ad125df.</span>css"&gt;</span>
+|        |       <span class="codegrey">&gt;  &lt; script src="js/index.<span class="spec">ft3e5g72.</span>js"&gt;</span>
+|        |-- css
+|        |    |-- index.<span class="spec">3ad125df.</span>css <span class="comment">↓</span>
+|        |    |     <span class="codegrey">&gt;  .logo{background:url('/img/a.<span class="spec">f1d3da2d.</span>png')}</span>
+|        |-- js
+|        |    |-- index.<span class="spec">ft3e5g72.</span>js 
+|        |-- img
+|             |-- a.<span class="spec">f1d3da2d.</span>png
+|             |-- b.<span class="spec">ld3gs12a.</span>png
+<span class="codegrey">|   //开发环境的文件不受影响
+|-- index.php
+|-- css (**/*.*)
+|-- js (**/*.*)
+|-- img (**/*.*)
+</span></pre></div><div class="api"><div class="api_tables"><span>Grunt</span></div><div class="api_contant"><h3>grunt-staticize</h3><p>写这个工具之前，参考了业界用的比较多的 grunt-filerev 以及 grunt-usemin , 他们在前端代码的打包和自动化上作出了巨大的贡献。</p><p>为了更好的整合这些工具，简化这个过程，才有了现在看到的 mStaticize ，暂时只提供 Grunt 版本，后续根据实际情况，可能会发布独立的版本工具。</p><h3>安装</h3><p>该插件需要依赖 Grunt ~0.4.5 如果没有接触过 <a href="http://gruntjs.com/" target="_blank">Grunt</a> ，请确保参考 Grunt 的<a href="http://gruntjs.com/getting-started" target="_blank">官方向导</a>，以了解如何建立 Grunt 项目，以及如何建立 <a href="http://gruntjs.com/sample-gruntfile" target="_blank"> Gruntfile </a>开始一个 Grunt 项目。</p><p>你可以通过下面的命令安装插件：</p><pre><code>npm install grunt-staticize --save-dev</code></pre><p>插件完成之后就可以通过下面的方式，在 Gruntfile 中引入该插件：</p><pre><code>grunt.loadNpmTasks('grunt-staticize');</code></pre><h3>staticize 用法</h3><h4>概述</h4><p>在项目的 Gruntfile 中，通过在 grunt.initConfig() 中添加 staticize 段落来执行 staticize ：</p><pre><code> grunt.initConfig({
+   staticize: {
+     targetName:{
+       rev:{  //校订任务（hash）
+         msite:{ //任务名称
+           'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
+           'dest': 'testF_2'
+         },
+         options: {  //任务配置
+           'encoding': 'utf8',
+           'algorithm': 'md5',
+           'length': 8
+         }
+       },
+       rep: {  //替换任务
+         msite: {  //替换任务名称
+           'files': ['temp/msite/*.{css,js,jade}'],
+           'assetsDirs': 'temp/msite/static/',
+           'patterns': /\/{0,1}\w+(\/\w+)*\.\w+/mg
+         }
+       }
+     }
+   },
+ });</code></pre><h4>Revisioning task 校订任务（hash）</h4><p>校订任务主要给静态文件添加hash版本号，例如 "/static/logo.jpg" -&gt; "/static/logo.d124da.jpg"</p><p>校订任务通过 "rev" 字段来定义，"rev" 为json字段，包含一个或者多个子任务（target），以及一个选填的配置（option）</p><pre><code> //...
+   rev:{
+     targetA:{
+       //...
+     }
+     targetB:{
+       //...
+     }
+     option:{
+       //...
+     }
+   }
+ //...</code></pre><h5>target 任务</h5><p>在每个任务中，需要指定 "files" 字段（你需要处理的文件） 以及 "dest" 字段（处理后的文件的存放目录）</p><p>"dest" 可选，如果指定了，将会在自定的目录存放处理好的文件，原始文件任然保留。如果未指定，将会在已有的文件上直接进行覆盖处理。</p><h5>options [optional] 配置（选填）</h5><h6>options.encoding [optional]</h6><p>类型: "String", 缺省值: "utf8"</p><p>文件的编码，默认为“utf8”</p><h6>options.algorithm [optional]</h6><p>类型: "String", 缺省值: "md5"</p><p>hash 方式，默认为“md5”</p><h6>options.length [optional]</h6><p>类型: "Number", 缺省值: 8</p><p>hash长度，默认为8</p><h5>例子</h5><pre><code> grunt.initConfig({
+   staticize: {
+     targetName:{
+       rev:{  //revisioning task
+         msite:{ //target
+           'files': ['temp/msite/**/*.{css,js,jpg,png,gif}'],
+           'dest': 'testF_2'
+         },
+         options: {  //revisioning options
+           'encoding': 'utf8',
+           'algorithm': 'md5',
+           'length': 8
+         }
+       }
+     }
+   },
+ });</code></pre><h4>Replace task 替换任务</h4><p>替换任务主要是查找并替换所有的静态资源的hash引用</p><p>当执行完成 校订任务（hash）之后，例如 “/static/logo.jpg” -&gt; “/static/logo.d124da.jpg”，相对于其他引用该文件的引用地址就应该进行智能匹配和替换。例如我们有下面的两个 index.css 和 index.html 文件：</p><pre><code> /* index.css */
+ /* ... */
+ .logo{
+      background:url('/static/logo.jpg');
+ }
+ /* ... */</code></pre><pre><code> &lt;!--  index.html  --&gt;
+ &lt;!--  ... --&gt;
+ &lt;img src="/static/logo.jpg"&gt;
+ &lt;!--  ... --&gt;</code></pre><p>在进行过替换任务之后，所有对logo.jpg的引用都会被替换，他们会变成：</p><pre><code> /* index.css */
+ /* ... */
+ .logo{
+      background:url('/static/logo.d124da.jpg');
+ }
+ /* ... */</code></pre><pre><code> &lt;!--  index.html  --&gt;
+ &lt;!--  ... --&gt;
+ &lt;img src="/static/logo.d124da.jpg"&gt;
+ &lt;!--  ... --&gt;</code></pre><p>替换任务通过字段 "rep" 进行标识</p><p>"rep" 是一个json类型的字符串，包含若干个子任务</p><pre><code> //...
+   rep:{
+     targetA: { },
+     targetB: { }
+   }
+ //...</code></pre><h5>target</h5><p>在每个任务中，需要指定下面的几个字段：</p><h6>files</h6><p>类型: "String", 必填</p><p>需要进行替换的文件，通常是 css,js 以及引用这些 css 和 js 的文件</p><h6>assetsDirs</h6><p>类型: "String", 必填</p><p>资源所在目录</p><h6>patterns</h6><p>类型: "RgeExp",必填</p><p>需要替换资源选择器</p><h5>例子</h5><pre><code> grunt.initConfig({
+   staticize: {
+     rep: {  //replace task 任务标识
+       msite: {  //子任务
+         'files': ['temp/msite/*.{css,js,jade}'],  //需要替换的文件
+         'assetsDirs': 'temp/msite/static/',  //文件中引用的静态文件所在的相对根目录
+         'patterns': /\/{0,1}\w+(\/\w+)*\.\w+/mg  
+          //匹配字符，这里匹配类似 'ad/ad.jpg','dfa/d.css' 的字符，尝试在assetsDirs中寻找是否有匹配的值，有的话进行匹配
+       }
+     }
+   },
+ });</code></pre><h3>感谢</h3><p>最后感谢大家的喜爱，也希望大家能对 mStaticize 提出宝贵意见！</p><h3>关于项目</h3><p>GitHub <a href="https://github.com/zmofei/grunt-staticize" target="_blank">https://github.com/zmofei/grunt-staticize</a></p><p>问题提交 <a href="https://github.com/zmofei/grunt-staticize/issues" target="_blank">https://github.com/zmofei/grunt-staticize/issues</a></p><p>关于作者 <a href="https://www.zhuwenlong.com/" target="_blank">https://www.zhuwenlong.com</a></p></div></div><footer>^_^   Powered By <a href="https://www.zhuwenlong.com/" target="_blank"> zhuwenlong.com</a></footer><script>var uid = localStorage.getItem('username');
+if(uid){
+  uid += '-' + localStorage.getItem('email');
+  uid += '-' + localStorage.getItem('website');
+  gtag('set', {'user_id': uid});
+}
+//
+var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "https://hm.baidu.com/hm.js?f4c53dc35cc4e26ed5f032c0d546a6a0";
+var s = document.getElementsByTagName("script")[0]; 
+s.parentNode.insertBefore(hm, s);
+})();</script></body><div id="cVim-status-bar" style="top: 0px;"></div><iframe src="./web/cmdline_frame.html" id="cVim-command-frame"></iframe></html>
